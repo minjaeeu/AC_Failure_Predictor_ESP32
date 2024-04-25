@@ -22,7 +22,7 @@ Upload Speed: 921600.
 
 The below libraries where used:
 
-ArduinoJson @7.0.4 - By Benoit Blanchon (https://arduinojson.org/?utm_source=meta&utm_medium=library.properties).
+ArduinoJson @7.0.4 - By Benoit Blanchon.
 HTTPClient @2015 - By Espressif Systems.
 time @2018 - By Espressif Systems.
 WiFi @2014 - By Espressif Systems.
