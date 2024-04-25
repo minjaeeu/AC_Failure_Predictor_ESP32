@@ -1,2 +1,19 @@
-# AC_Failure_Predictor_ESP32
-ESP32 application using a DHT11 and SCT-013-020A sensors for capturing emp, humidity and wattage information and sending it via HTTP to a RESTful server for a failure prediction projected aimed at air conditioning units. Part of an avaluation score for the "GBOPEITCOM00 - INTELIGÊNCIA COMPUTACIONAL - T01 (2024.1)" discipline/class 
+*Requires prior setup of https://github.com/minjaeeu/AC_Failure_Predictor_rest_server (RESTful server) to work
+
+
+Code was written using Arduino IDE version @2.2.1 on a ESP32 DEV module, the below configurations where used to flash the code:
+#todo finish
+
+
+The below libraries where used:
+
+ArduinoJson @7.0.4 - By Benoit Blanchon (https://arduinojson.org/?utm_source=meta&utm_medium=library.properties)
+HTTPClient @2015 - By Espressif Systems
+time @2018 - By Espressif Systems
+WiFi @2014 - By Espressif Systems
+
+
+
+
+
+
