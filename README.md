@@ -1,8 +1,23 @@
-*Requires prior setup of https://github.com/minjaeeu/AC_Failure_Predictor_rest_server (RESTful server) to work
+*Requires prior setup of https://github.com/minjaeeu/AC_Failure_Predictor_rest_server (RESTful server) to work.
+
+*This project was developed with ESP32-DevKitC (https://docs.espressif.com/projects/esp-idf/en/latest/esp32/hw-reference/esp32/get-started-devkitc.html) board in mind.
 
 
-Code was written using Arduino IDE version @2.2.1 on a ESP32 DEV module, the below configurations where used to flash the code:
-#todo finish
+
+Code was written using Arduino IDE version @2.2.1 on a ESP32-DevKitC module, the below configurations where used to flash the code:
+
+CPU Frequency: 240MHz (WiFi/BT)
+Core Debug Leve: None
+Erase All Flash Before Sketch Upload: Disabled
+Events Run On: Core 1
+Flash Frequency: 80MHz
+Flash Mode: DIO
+Flash Size: 4MB (32Mb)
+JTAG Adapter: Disabled
+Arduino Runs On: Core 1
+Partition Scheme: Default 4MB with spiffs (1.2MB APP/1.5MB SPIFFS)
+PSRAM: Disabled
+Upload Speed: 921600
 
 
 The below libraries where used:
