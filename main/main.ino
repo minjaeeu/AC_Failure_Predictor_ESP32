@@ -2,16 +2,26 @@
 #include <HTTPClient.h>
 #include <ArduinoJson.h>
 #include <time.h>
+#include <DHT.h>
 
-const char* ssid = "XXXXX";   // network name, must be the same network as the API server
-const char* password = "XXXXX";  // network password, must be the same network as the API server
+#define DHT11Pin 5  // GPIO pin for the DHT11 sensor
+#define DHTType DHT11
 
-char currentDateTime[20];
-char payload[256];
+DHT dht(DHT11Pin, DHTType);
+float humidity, temp;  // will hold the readings from DHT11 sensor
 
-String postEndpoint = "XXXXXXXXXXXXXX";  // API endpoint for adding new entry
-JsonDocument json;
+const char* ssid = "XXXXXXXXXXXXXXX";   // network name, must be the same network as the API server
+const char* password = "XXXXXXXXXXXXXXX";  // network password, must be the same network as the API server
+
+char currentDateTime[20];  // holds the current datetime from the RTC as YYYY-MM-DD HH:MM:SS
+
+String postEndpoint = "XXXXXXXXXXXXXXX";  // API endpoint for adding new entry
 HTTPClient session;
+JsonDocument json;
+int httpResponseCode;  // holds the response code
+char payload[256];     // holds the payload with sensors data
+
+
 
 // sleeps using millis() for a certain amount of time in ms
 void sleep(int sleepTime) {
@@ -58,6 +68,7 @@ void configureRTC(void) {
   }
 }
 
+
 void setup() {
   Serial.begin(115200);
 
@@ -66,6 +77,22 @@ void setup() {
 }
 
 void loop() {
+
+  // taking DTH11 samples (note that the sampling time for this sensor is 2 seconds)
+  humidity = dht.readHumidity();
+  temp = dht.readTemperature();
+
+  // Check if any reads failed, if failed wait for 2 seconds to try again.
+  while (isnan(humidity) || isnan(temp)) {
+    Serial.println("Failed to read from DHT sensor!");
+    Serial.println("Trying to read again...");
+    sleep(2000);
+    humidity = dht.readHumidity();
+    temp = dht.readTemperature();
+  }
+
+
+
   // sending sensor mock data to API
   if (WiFi.status() == WL_CONNECTED) {
     session.begin(postEndpoint);
@@ -73,16 +100,16 @@ void loop() {
 
     // // creating the payload
     json["datetime"] = String(getDateTime(currentDateTime));  // current date time as YYYY-MM-DD HH:MM:SS
-    json["humidity"] = 55.7576576;                            // value from humidity sensor
-    json["temperature"] = 55.7333587986;                      // value from temp sensor
-    json["wattage"] = 55.32336;                               // value from amp sensor
+    json["humidity"] = String(humidity, 2);                   // value from humidity sensor, converted to String in order to truncate easily as it will not matter inside the json payload
+    json["temperature"] = String(temp, 2);                    // value from temp sensor, converted to String in order to truncate easily as it will not matter inside the json payload
+    json["wattage"] = String(55.32336, 2);                    // value from amp sensor, converted to String in order to truncate easily as it will not matter inside the json payload
 
 
-    serializeJson(json, payload);                          // serializing the json into the payload char
-    int httpResponseCode = session.POST(String(payload));  // makes post request & passes response code to the variable at the left
+    serializeJson(json, payload);                      // serializing the json into the payload char
+    httpResponseCode = session.POST(String(payload));  // makes post request & passes response code to the variable at the left
 
-    sleep(2000);  // sleeping for 2 second before doing another push
     Serial.println("status code is: " + String(httpResponseCode));
-    Serial.println(payload);
+    Serial.println("payload is: " + String(payload));
   }
+  sleep(2000);  // sleeping for 2 second before doing loop run
 }
