@@ -2,22 +2,24 @@
 #include <HTTPClient.h>
 #include <ArduinoJson.h>
 #include <time.h>
-#include <DHT.h>  
+#include <DHT.h>
 
-#define DHT11Pin 5
+#define DHT11Pin 5  // GPIO pin for the DHT11 sensor
 #define DHTType DHT11
 
 DHT dht(DHT11Pin, DHTType);
+float humidity, temp;  // will hold the readings from DHT11 sensor
 
-const char* ssid = "XXXXXXXXXXXXXX";   // network name, must be the same network as the API server
-const char* password = "XXXXXXXXXXXXXX";  // network password, must be the same network as the API server
+const char* ssid = "XXXXXXXXXXXXXXX";   // network name, must be the same network as the API server
+const char* password = "XXXXXXXXXXXXXXX";  // network password, must be the same network as the API server
 
-char currentDateTime[20];
-char payload[256];
+char currentDateTime[20];  // holds the current datetime from the RTC as YYYY-MM-DD HH:MM:SS
 
-String postEndpoint = "XXXXXXXXXXXXXX";  // API endpoint for adding new entry
-JsonDocument json;
+String postEndpoint = "XXXXXXXXXXXXXXX";  // API endpoint for adding new entry
 HTTPClient session;
+JsonDocument json;
+int httpResponseCode;  // holds the response code
+char payload[256];     // holds the payload with sensors data
 
 
 
@@ -77,8 +79,8 @@ void setup() {
 void loop() {
 
   // taking DTH11 samples (note that the sampling time for this sensor is 2 seconds)
-  float humidity = dht.readHumidity();
-  float temp = dht.readTemperature();
+  humidity = dht.readHumidity();
+  temp = dht.readTemperature();
 
   // Check if any reads failed, if failed wait for 2 seconds to try again.
   while (isnan(humidity) || isnan(temp)) {
@@ -103,8 +105,8 @@ void loop() {
     json["wattage"] = String(55.32336, 2);                    // value from amp sensor, converted to String in order to truncate easily as it will not matter inside the json payload
 
 
-    serializeJson(json, payload);                          // serializing the json into the payload char
-    int httpResponseCode = session.POST(String(payload));  // makes post request & passes response code to the variable at the left
+    serializeJson(json, payload);                      // serializing the json into the payload char
+    httpResponseCode = session.POST(String(payload));  // makes post request & passes response code to the variable at the left
 
     Serial.println("status code is: " + String(httpResponseCode));
     Serial.println("payload is: " + String(payload));
