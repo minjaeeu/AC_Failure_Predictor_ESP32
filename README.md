@@ -26,7 +26,7 @@ ArduinoJson @7.0.4 - By Benoit Blanchon.
 HTTPClient @2015 - By Espressif Systems.
 time @2018 - By Espressif Systems.
 WiFi @2014 - By Espressif Systems.
-
+DHT sensor library @1.4.6 - By Adafruit.
 
 
 
