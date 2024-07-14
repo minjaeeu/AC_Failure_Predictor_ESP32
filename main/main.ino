@@ -3,14 +3,20 @@
 #include <ArduinoJson.h>
 #include <time.h>
 #include <DHT.h>
+#include <EmonLib.h>
 
-#define DHT11Pin 5  // GPIO pin for the DHT11 sensor
-#define DHTType DHT11
+#define SCT013Pin 34  // GPIO pin for the SCT 013-20A-1V sensor
+#define DHT11Pin 5    // GPIO pin for the DHT11 sensor
+#define DHTType DHT11 
+#define SamplingTime 2000 // Default sleep time in MS from which our loop will be halted after each sampling 
+
+EnergyMonitor emon1;
+double irms; // will hold the irms readings from emonlib through SCT013 sensor
 
 DHT dht(DHT11Pin, DHTType);
 float humidity, temp;  // will hold the readings from DHT11 sensor
 
-const char* ssid = "XXXXXXXXXXXXXXX";   // network name, must be the same network as the API server
+const char* ssid = "XXXXXXXXXXXXXXX";      // network name, must be the same network as the API server
 const char* password = "XXXXXXXXXXXXXXX";  // network password, must be the same network as the API server
 
 char currentDateTime[20];  // holds the current datetime from the RTC as YYYY-MM-DD HH:MM:SS
@@ -74,11 +80,18 @@ void setup() {
 
   configureWiFi();
   configureRTC();
+
+  emon1.current(SCT013Pin, 20);  // Calibration for volta output sensors -> input/output 20A/1V = 20.
 }
 
 void loop() {
 
-  // taking DTH11 samples (note that the sampling time for this sensor is 2 seconds)
+  // Taking the current value from SCT-013-20A-1V
+  irms = emon1.calcIrms(1480); // 1480 == number of samples
+  irms = irms/2; // On tests it was shown that the current readings from SCT-013-20A-1V 
+                // where double than a standard clamp meter, hence the division.
+  
+  // Taking DTH11 samples (note that the sampling time for this sensor is 2 seconds)
   humidity = dht.readHumidity();
   temp = dht.readTemperature();
 
@@ -100,9 +113,9 @@ void loop() {
 
     // // creating the payload
     json["datetime"] = String(getDateTime(currentDateTime));  // current date time as YYYY-MM-DD HH:MM:SS
-    json["humidity"] = String(humidity, 2);                   // value from humidity sensor, converted to String in order to truncate easily as it will not matter inside the json payload
-    json["temperature"] = String(temp, 2);                    // value from temp sensor, converted to String in order to truncate easily as it will not matter inside the json payload
-    json["wattage"] = String(55.32336, 2);                    // value from amp sensor, converted to String in order to truncate easily as it will not matter inside the json payload
+    json["humidity"] = String(humidity, 2);                   // value from DTH11 sensor
+    json["temperature"] = String(temp, 2);                    // value from DTH11 sensor
+    json["current"] = String(irms, 2);                        // value from SCT-013-20A-1V sensor
 
 
     serializeJson(json, payload);                      // serializing the json into the payload char
@@ -111,5 +124,5 @@ void loop() {
     Serial.println("status code is: " + String(httpResponseCode));
     Serial.println("payload is: " + String(payload));
   }
-  sleep(2000);  // sleeping for 2 second before doing loop run
+  sleep(SamplingTime);  // sleeping for X seconds before doing loop run
 }

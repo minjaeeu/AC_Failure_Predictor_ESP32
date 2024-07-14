@@ -2,7 +2,7 @@
 
 *This project was developed with ESP32-DevKitC (https://docs.espressif.com/projects/esp-idf/en/latest/esp32/hw-reference/esp32/get-started-devkitc.html) board in mind.
 
-*The following two sensors where used: DHT11 (temp/humidity) and SCT-013-020A (current).
+*The following two sensors where used: DHT11 (temp/humidity) and SCT-013-020A-1V (current).
 
 Code was written using Arduino IDE version @2.2.1 on a ESP32-DevKitC module, the below configurations where used to flash the code:
 
@@ -27,7 +27,7 @@ HTTPClient @2015 - By Espressif Systems.<br />
 time @2018 - By Espressif Systems.<br />
 WiFi @2014 - By Espressif Systems.<br />
 DHT sensor library @1.4.6 - By Adafruit.<br />
-
+EmonLib library @1.1.0 - By OpenEnergyMonitor.<br />
 
 
 
